@@ -16,8 +16,13 @@ let getCRUD = (req, res) => {
 };
 
 let postCRUD = async (req, res) => {
-    await CRUDService.createNewUser(req.body);
-    res.send(req.body);
+    let message = await CRUDService.createNewUser(req.body);
+    res.redirect('back');
 };
 
-export default { getHomePage, getCRUD, postCRUD };
+let displayCRUD = async (req, res) => {
+    let data = await CRUDService.getAllUser();
+    res.render('displayCRUD', { data });
+};
+
+export default { getHomePage, getCRUD, postCRUD, displayCRUD };
