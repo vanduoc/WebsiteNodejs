@@ -1,3 +1,4 @@
+import res from 'express/lib/response.js';
 import userService from '../services/userService.js';
 
 let handleLogin = async (req, res) => {
@@ -23,16 +24,46 @@ let handleGetAllUsers = async (req, res) => {
     if (!id) {
         return res.status(200).json({
             errCode: 0,
-            errMessage: 'Missing required parameters!!',
+            message: 'Missing required parameters!!',
             users: [],
         });
     }
     let users = await userService.getAllUsers(id);
     return res.status(200).json({
         errCode: 0,
-        errMessage: 'OK',
+        message: 'OK',
         users,
     });
 };
 
-export default { handleLogin, handleGetAllUsers };
+let handleCreateNewUser = async (req, res) => {
+    let message = await userService.createNewUser(req.body);
+    return res.status(200).json(message);
+};
+
+let handleDeleteUser = async (req, res) => {
+    let userId = req.body.id;
+    if (!userId) {
+        return res.status(500).json({
+            errCode: '1',
+            message: 'Invalid input parameters!',
+        });
+    }
+    let message = await userService.deleteUser(userId);
+    return res.status(200).json(message);
+};
+
+let handleEditUser = async (req, res) => {
+    let data = req.body;
+    if (!data) {
+        return res.status(500).json({
+            errCode: '1',
+            message: 'Invalid input data!',
+        });
+    }
+    let message = await userService.updateUserData(data);
+    console.log('the message error is: ', message);
+    return res.status(200).json(message);
+};
+
+export default { handleLogin, handleGetAllUsers, handleCreateNewUser, handleDeleteUser, handleEditUser };
