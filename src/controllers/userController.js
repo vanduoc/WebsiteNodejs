@@ -62,8 +62,19 @@ let handleEditUser = async (req, res) => {
         });
     }
     let message = await userService.updateUserData(data);
-    console.log('the message error is: ', message);
     return res.status(200).json(message);
 };
 
-export default { handleLogin, handleGetAllUsers, handleCreateNewUser, handleDeleteUser, handleEditUser };
+let getAllCode = async (req, res) => {
+    try {
+        let data = await userService.getAllCodeService(req.query.type);
+        return res.status.json(data);
+    } catch (error) {
+        return res.status(200).json({
+            errCode: -1,
+            message: 'Error from server',
+        });
+    }
+};
+
+export default { handleLogin, handleGetAllUsers, handleCreateNewUser, handleDeleteUser, handleEditUser, getAllCode };
