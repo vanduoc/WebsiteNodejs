@@ -116,8 +116,8 @@ let createNewUser = async (data) => {
                     phoneNumber: data.phoneNumber,
                     gender: data.gender,
                     image: data.image,
-                    roleId: data.role,
-                    positionId: data.position,
+                    roleId: data.roleId,
+                    positionId: data.positionId,
                 });
                 resolve({
                     errCode: 0,
@@ -171,8 +171,12 @@ let deleteUser = (inputId) => {
 let updateUserData = (data) => {
     return new Promise(async (resolve, reject) => {
         try {
-            let userId = data.id;
-            if (userId) {
+            if (!data.id && !data.roleId && !data.gender && !data.positionId) {
+                resolve({
+                    errCode: 2,
+                    message: 'Missing required parameter!',
+                });
+            } else {
                 let user = await db.User.findOne({
                     where: {
                         id: data.id,
@@ -192,6 +196,7 @@ let updateUserData = (data) => {
                             phoneNumber: data.phoneNumber,
                             gender: data.gender,
                             roleId: data.roleId,
+                            positionId: data.positionId,
                         },
                         {
                             where: {
@@ -204,11 +209,6 @@ let updateUserData = (data) => {
                         message: 'Update the user succeeds',
                     });
                 }
-            } else {
-                resolve({
-                    errCode: 2,
-                    message: 'Missing required parameter!',
-                });
             }
         } catch (error) {
             reject(error);
