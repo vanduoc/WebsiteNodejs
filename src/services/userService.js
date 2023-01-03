@@ -188,22 +188,41 @@ let updateUserData = (data) => {
                         message: "The user isn't exist!",
                     });
                 } else {
-                    await db.User.update(
-                        {
-                            firstName: data.firstName,
-                            lastName: data.lastName,
-                            address: data.address,
-                            phoneNumber: data.phoneNumber,
-                            gender: data.gender,
-                            roleId: data.roleId,
-                            positionId: data.positionId,
-                        },
-                        {
-                            where: {
-                                id: data.id,
+                    if (data.image) {
+                        await db.User.update(
+                            {
+                                firstName: data.firstName,
+                                lastName: data.lastName,
+                                address: data.address,
+                                phoneNumber: data.phoneNumber,
+                                gender: data.gender,
+                                roleId: data.roleId,
+                                positionId: data.positionId,
+                                image: data.image,
                             },
-                        },
-                    );
+                            {
+                                where: {
+                                    id: data.id,
+                                },
+                            },
+                        );
+                    } else
+                        await db.User.update(
+                            {
+                                firstName: data.firstName,
+                                lastName: data.lastName,
+                                address: data.address,
+                                phoneNumber: data.phoneNumber,
+                                gender: data.gender,
+                                roleId: data.roleId,
+                                positionId: data.positionId,
+                            },
+                            {
+                                where: {
+                                    id: data.id,
+                                },
+                            },
+                        );
                     resolve({
                         errCode: 0,
                         message: 'Update the user succeeds',
