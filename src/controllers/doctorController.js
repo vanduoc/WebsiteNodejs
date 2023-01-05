@@ -15,4 +15,18 @@ let getTopDoctorHome = async (req, res) => {
     }
 };
 
+// let getDetailDoctorById = async (req, res) => {
+//     try {
+//         let id = req.query.id;
+//         let res = await doctorService.getDetailDoctorById(id);
+//         return res.status(200).json(res);
+//     } catch (error) {
+//         console.log(error);
+//         return res.status(200).json({
+//             errCode: -1,
+//             message: 'Error from server...',
+//         });
+//     }
+// };
+
 export default { getTopDoctorHome };

@@ -29,4 +29,46 @@ let getTopDoctorHome = (limit) => {
     });
 };
 
+// let getDetailDoctorById = (inputId) => {
+//     return new Promise(async (resolve, reject) => {
+//         try {
+//             if (!inputId) {
+//                 resolve({
+//                     errCode: 1,
+//                     message: 'Missing requied parameter!',
+//                 });
+//             } else {
+//                 let data = await db.User.findOne({
+//                     where: {
+//                         id: inputId,
+//                     },
+//                     attributes: {
+//                         exclude: ['password'],
+//                     },
+//                     include: [
+//                         {
+//                             model: db.Markdown,
+//                             attributes: ['description', 'contentHTML', 'contentMarkdown'],
+//                         },
+//                         { model: db.Allcode, as: 'positionData', attributes: ['valueEn', 'valueVi'] },
+//                     ],
+//                     raw: false,
+//                     nest: true,
+//                 });
+//                 if (data && data.image) {
+//                     data.image = new Buffer(data.image, 'base64').toString('binary');
+//                 }
+//                 if (!data) data = {};
+//                 resolve({
+//                     errCode: 0,
+//                     message: 'Ok',
+//                     data: data,
+//                 });
+//             }
+//         } catch (error) {
+//             reject(error);
+//         }
+//     });
+// };
+
 export default { getTopDoctorHome };
