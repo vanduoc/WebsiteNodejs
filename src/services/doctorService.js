@@ -29,46 +29,97 @@ let getTopDoctorHome = (limit) => {
     });
 };
 
-// let getDetailDoctorById = (inputId) => {
-//     return new Promise(async (resolve, reject) => {
-//         try {
-//             if (!inputId) {
-//                 resolve({
-//                     errCode: 1,
-//                     message: 'Missing requied parameter!',
-//                 });
-//             } else {
-//                 let data = await db.User.findOne({
-//                     where: {
-//                         id: inputId,
-//                     },
-//                     attributes: {
-//                         exclude: ['password'],
-//                     },
-//                     include: [
-//                         {
-//                             model: db.Markdown,
-//                             attributes: ['description', 'contentHTML', 'contentMarkdown'],
-//                         },
-//                         { model: db.Allcode, as: 'positionData', attributes: ['valueEn', 'valueVi'] },
-//                     ],
-//                     raw: false,
-//                     nest: true,
-//                 });
-//                 if (data && data.image) {
-//                     data.image = new Buffer(data.image, 'base64').toString('binary');
-//                 }
-//                 if (!data) data = {};
-//                 resolve({
-//                     errCode: 0,
-//                     message: 'Ok',
-//                     data: data,
-//                 });
-//             }
-//         } catch (error) {
-//             reject(error);
-//         }
-//     });
-// };
+let getAllDoctors = () => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            let doctors = await db.User.findAll({
+                where: {
+                    roleId: 'R2',
+                },
+                order: [['createdAt', 'DESC']],
+                attributes: {
+                    exclude: ['password', 'image'],
+                },
+            });
+            resolve({
+                errCode: 0,
+                data: doctors,
+            });
+        } catch (error) {
+            reject(error);
+        }
+    });
+};
 
-export default { getTopDoctorHome };
+let saveInforDoctor = (inputData) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            if (inputData && inputData.doctorId && inputData.contentHTML && inputData.contentMarkdown) {
+                await db.Markdown.create({
+                    contentHTML: inputData.contentHTML,
+                    contentMarkdown: inputData.contentMarkdown,
+                    description: inputData.description,
+                    doctorId: inputData.doctorId,
+                });
+                resolve({
+                    errCode: 0,
+                    message: 'OK',
+                });
+            } else
+                resolve({
+                    errCode: -1,
+                    message: 'Missing required parmeter!',
+                });
+        } catch (error) {
+            reject(error);
+        }
+    });
+};
+
+let getDetailDoctorById = (inputId) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            if (!inputId) {
+                resolve({
+                    errCode: 1,
+                    message: 'Missing requied parameter!',
+                });
+            } else {
+                let data = await db.User.findOne({
+                    where: {
+                        id: inputId,
+                    },
+                    attributes: {
+                        exclude: ['password'],
+                    },
+                    include: [
+                        {
+                            model: db.Markdown,
+                            attributes: ['description', 'contentHTML', 'contentMarkdown'],
+                        },
+                    ],
+                    raw: false,
+                    nest: true,
+                });
+                if (data && data.image) {
+                    data.image = new Buffer.from(data.image, 'base64').toString('binary');
+                }
+                if (!data) {
+                    resolve({
+                        errCode: 1,
+                        message: 'User not found...',
+                    });
+                }
+                resolve({
+                    errCode: 0,
+                    message: 'Ok',
+                    data: data,
+                });
+            }
+        } catch (error) {
+            reject(error);
+        }
+    });
+};
+
+export default { getTopDoctorHome, getAllDoctors, saveInforDoctor, getDetailDoctorById };
