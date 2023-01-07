@@ -97,6 +97,11 @@ let getDetailDoctorById = (inputId) => {
                             model: db.Markdown,
                             attributes: ['description', 'contentHTML', 'contentMarkdown'],
                         },
+                        {
+                            model: db.Allcode,
+                            as: 'positionData',
+                            attributes: ['valueVi', 'valueEn'],
+                        },
                     ],
                     raw: false,
                     nest: true,
