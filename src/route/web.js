@@ -13,6 +13,7 @@ let initWebRoutes = (app) => {
     router.get('/edit-crud', homeController.getEditCRUD);
     router.get('/delete-crud', homeController.deleteCRUD);
     router.post('/put-crud', homeController.putCRUD);
+    router.get('/allcode', userController.getAllCode);
 
     router.post('/api/login', userController.handleLogin);
     router.get('/api/get-all-users', userController.handleGetAllUsers);
@@ -23,11 +24,8 @@ let initWebRoutes = (app) => {
     router.get('/api/top-doctor-home', doctorController.getTopDoctorHome);
     router.get('/api/get-all-doctors', doctorController.getAllDoctors);
     router.get('/api/get-infor-doctor-by-id', doctorController.getInforDoctorById);
-
     router.post('/api/save-infor-doctor', doctorController.saveInforDoctor);
-    // router.get('/api/get-detail-doctor', doctorController.getDetailDoctorById);
-
-    router.get('/allcode', userController.getAllCode);
+    router.post('/api/bulk-create-schedule', doctorController.saveBulkCreateSchedule);
 
     return app.use('/', router);
 };

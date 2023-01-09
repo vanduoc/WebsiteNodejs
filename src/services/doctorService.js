@@ -1,4 +1,8 @@
 import db from '../models/index.cjs';
+import dotenv from 'dotenv';
+import _ from 'lodash';
+dotenv.config();
+const MAX_NUMBER_SCHEDULE = process.env.MAX_NUMBER_SCHEDULE;
 
 let getTopDoctorHome = (limit) => {
     return new Promise(async (resolve, reject) => {
@@ -127,4 +131,49 @@ let getDetailDoctorById = (inputId) => {
     });
 };
 
-export default { getTopDoctorHome, getAllDoctors, saveInforDoctor, getDetailDoctorById };
+let bulkCreateSchedule = (data) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            if (data && data.length > 0) {
+                let toCreate = [];
+                let schedule = data.map((item) => ({
+                    maxNumber: MAX_NUMBER_SCHEDULE,
+                    date: item.date,
+                    timeType: item.timeType,
+                    doctorId: item.doctorId,
+                }));
+                for (let item of schedule) {
+                    let existing = await db.Schedule.findOne({
+                        where: {
+                            doctorId: item.doctorId,
+                            date: item.date,
+                            timeType: item.timeType,
+                        },
+                        attributes: ['timeType', 'date', 'doctorId', 'maxNumber'],
+                    });
+                    if (!existing) toCreate = [...toCreate, item];
+                    // Hàm check Sự khác nhau giữa 2 mảng trả về 1 mảng mới gồm các item khác nhau
+                    // toCreate = _.differenceBy(schedule, existing, (a, b) => {
+                    // return  a.timeType === b.timeType && a.date == b.date;
+                    // });
+                }
+                if (toCreate && toCreate.length > 0) {
+                    await db.Schedule.bulkCreate(toCreate);
+                    resolve({
+                        errCode: 0,
+                        message: 'OK',
+                    });
+                }
+            } else {
+                resolve({
+                    errCode: -1,
+                    message: 'Invalid input data',
+                });
+            }
+        } catch (error) {
+            reject(error);
+        }
+    });
+};
+
+export default { getTopDoctorHome, getAllDoctors, saveInforDoctor, getDetailDoctorById, bulkCreateSchedule };

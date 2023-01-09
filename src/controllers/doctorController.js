@@ -56,4 +56,18 @@ let getInforDoctorById = async (req, res) => {
     }
 };
 
-export default { getTopDoctorHome, getAllDoctors, saveInforDoctor, getInforDoctorById };
+let saveBulkCreateSchedule = async (req, res) => {
+    try {
+        let data = req.body;
+        let respone = await doctorService.bulkCreateSchedule(data);
+        return res.status(200).json(respone);
+    } catch (error) {
+        console.log(error);
+        return res.status(200).json({
+            errCode: -1,
+            message: 'Error from the server...',
+        });
+    }
+};
+
+export default { getTopDoctorHome, getAllDoctors, saveInforDoctor, getInforDoctorById, saveBulkCreateSchedule };
