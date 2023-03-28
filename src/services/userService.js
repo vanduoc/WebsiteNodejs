@@ -261,4 +261,11 @@ let getAllCodeService = (typeInput) => {
     });
 };
 
-export default { handleUserLogin, getAllUsers, createNewUser, deleteUser, updateUserData, getAllCodeService };
+export default {
+    handleUserLogin,
+    getAllUsers,
+    createNewUser,
+    deleteUser,
+    updateUserData,
+    getAllCodeService,
+};
