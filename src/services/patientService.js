@@ -29,6 +29,10 @@ let saveBookAppointment = (data) => {
                     defaults: {
                         email: data.email,
                         roleId: 'R3',
+                        firstName: data.fullName,
+                        phoneNumber: data.phoneNumber,
+                        address: data.address,
+                        gender: data.gender,
                     },
                 });
                 if (user && user[0]) {

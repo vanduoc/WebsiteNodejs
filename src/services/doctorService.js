@@ -1,6 +1,7 @@
 import db from '../models/index.cjs';
 import dotenv from 'dotenv';
 import _ from 'lodash';
+import emailService from './emailService.js';
 dotenv.config();
 const MAX_NUMBER_SCHEDULE = process.env.MAX_NUMBER_SCHEDULE;
 
@@ -486,6 +487,107 @@ let getOldDoctorExtraInfo = (inputId) => {
     });
 };
 
+let getPatientForDoctor = (doctorId, date) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            if (!doctorId || !date) {
+                resolve({
+                    errCode: 1,
+                    message: 'Missing required parameter...',
+                });
+            } else {
+                let data = await db.Booking.findAll({
+                    where: {
+                        doctorId: doctorId,
+                        date: date,
+                        statusId: 'S2',
+                    },
+                    attributes: {
+                        exclude: ['id', 'token', 'createdAt', 'updatedAt'],
+                    },
+                    include: [
+                        {
+                            model: db.User,
+                            as: 'patientData',
+                            attributes: ['firstName', 'gender', 'email', 'phoneNumber', 'address'],
+                            include: [
+                                {
+                                    model: db.Allcode,
+                                    as: 'genderData',
+                                    attributes: ['valueVi', 'valueEn'],
+                                },
+                            ],
+                        },
+                        {
+                            model: db.Allcode,
+                            as: 'timeTypeData',
+                            attributes: ['valueVi', 'valueEn'],
+                        },
+                    ],
+                    nest: true,
+                    raw: false,
+                });
+                resolve({
+                    errCode: 0,
+                    message: 'OK',
+                    data: data,
+                });
+            }
+        } catch (error) {
+            reject(error);
+        }
+    });
+};
+
+const sendRemedy = (data) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            if (!data.doctorId || !data.patientId || !data.timeType || !data.imgBase64) {
+                resolve({
+                    errCode: 1,
+                    message: 'Missing requied parameter!',
+                });
+            } else {
+                // update booking status
+                let bookingAppointment = await db.Booking.findOne({
+                    where: {
+                        doctorId: data.doctorId,
+                        patientId: data.patientId,
+                        timeType: data.timeType,
+                        statusId: 'S2',
+                    },
+                    raw: false,
+                });
+
+                if (bookingAppointment) {
+                    bookingAppointment.statusId = 'S3';
+                    await bookingAppointment.save();
+
+                    // send email
+                    await emailService.sendAttachment({
+                        patientName: data.patientName,
+                        reciverEmail: data.email,
+                        language: data.language,
+                        imgBase64: data.imgBase64,
+                    });
+
+                    resolve({
+                        errCode: 0,
+                        message: 'OK',
+                    });
+                }
+
+                resolve({
+                    errCode: 1,
+                    message: 'Cannot find booking appoint...',
+                });
+            }
+        } catch (error) {
+            reject(error);
+        }
+    });
+};
+
 export default {
     getTopDoctorHome,
     getAllDoctors,
@@ -496,4 +598,6 @@ export default {
     getProfileDoctorByid,
     getExtraInforDoctor,
     getOldDoctorExtraInfo,
+    getPatientForDoctor,
+    sendRemedy,
 };

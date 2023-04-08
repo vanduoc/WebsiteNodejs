@@ -55,4 +55,55 @@ let getBodyHTMLmail = (dataSend) => {
     return result;
 };
 
-export default { sendSimpleEmail };
+let sendAttachment = async (dataSend) => {
+    let transporter = nodemailer.createTransport({
+        host: 'smtp.gmail.com',
+        port: 587,
+        secure: false, // true for 465, false for other ports
+        auth: {
+            user: process.env.EMAIL_APP, // generated ethereal user
+            pass: process.env.EMAIL_APP_PASSWORD, // generated ethereal password
+        },
+    });
+
+    // send mail with defined transport object
+    let infor = await transporter.sendMail({
+        from: '"Duoc Huynh 👻" <vanduoc198@gmail.com>', // sender address
+        to: dataSend.reciverEmail, // list of receivers
+        subject: 'Kết quả khám bệnh', // Subject line
+        // text: 'Hello world?', // plain text body
+        html: getBodyHTMLmailRemedy(dataSend), // html body
+        attachments: [
+            {
+                // encoded string as an attachment
+                filename: 'ketQuaKhamBenh.jpg',
+                content: dataSend.imgBase64.split('base64,')[1],
+                encoding: 'base64',
+            },
+        ],
+    });
+};
+
+let getBodyHTMLmailRemedy = (dataSend) => {
+    let result = '';
+    if (dataSend.language === 'vi') {
+        result = `
+        <h3>Xin chào ${dataSend.patientName}</h3>
+        <p>Bạn nhận được email này vì đã hoàn thành khám bệnh tại cơ sở của chúng tôi !!!</p>
+        <p>Thông tin đơn thuốc và hóa đơn được gửi trong file đính kèm.</p>
+        
+        <div>Xin chân thành cảm ơn!</div>
+        `;
+    } else {
+        result = `
+            <h3>Dear, ${dataSend.patientName}</h3>
+            <p>You received this email for completing your medical examination at our facility!!!</p>
+            <p>Prescription information and invoices are sent in the attachment.</p>
+
+            <div>Sincerely thank!</div>
+        `;
+    }
+    return result;
+};
+
+export default { sendSimpleEmail, sendAttachment };
